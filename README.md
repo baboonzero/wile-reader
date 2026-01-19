@@ -17,6 +17,7 @@
 - **ORP Highlighting** — Red character marks the optimal recognition point
 - **Dynamic Pacing** — Automatic slowdown for punctuation and long words
 - **Speed Control** — Adjustable 100-900 WPM with presets
+- **Responsive Design** — Optimized word positioning for mobile, tablet, and desktop
 
 ### Input Methods
 
@@ -33,12 +34,13 @@
 
 ### Controls
 
-| Key    | Action             |
-| ------ | ------------------ |
-| Space  | Play/Pause         |
-| ← / →  | Skip 10 words      |
-| ↑ / ↓  | Adjust speed       |
-| Escape | Show/hide controls |
+| Key    | Action                      |
+| ------ | --------------------------- |
+| Space  | Play/Pause                  |
+| ← / →  | Skip 10 words               |
+| ↑ / ↓  | Adjust speed                |
+| Escape | Show/hide controls          |
+| Tap    | Show/hide controls (mobile) |
 
 ---
 

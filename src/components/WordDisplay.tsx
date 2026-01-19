@@ -22,8 +22,6 @@ export function WordDisplay({ word, isBraking, onTap }: WordDisplayProps) {
   const orp = text[orpIndex];
   const after = text.slice(orpIndex + 1);
 
-  const fontSize = 'clamp(48px, 12vw, 72px)';
-
   return (
     <div
       onClick={onTap}
@@ -31,33 +29,22 @@ export function WordDisplay({ word, isBraking, onTap }: WordDisplayProps) {
         isBraking ? 'brightness-75' : ''
       }`}
     >
-      {/* Fixed ORP anchor point at screen center - this is where the red character will ALWAYS be */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-
+      {/* Word container - uses CSS classes for responsive positioning */}
+      <div className="word-position absolute left-1/2 -translate-x-1/2 -translate-y-1/2">
         <div className="relative animate-fade-in-word">
-          {/* Container for the word with absolute positioning */}
-          <div
-            className="font-reading font-semibold leading-tight tracking-tight whitespace-nowrap"
-            style={{ fontSize }}
-          >
-            {/* Text before ORP - positioned to the LEFT, ending at the anchor */}
-            <span
-              className="absolute right-full text-text-primary"
-              style={{ top: 0 }}
-            >
+          <div className="word-text font-reading font-semibold leading-tight tracking-tight whitespace-nowrap">
+            {/* Text before ORP */}
+            <span className="absolute right-full text-text-primary" style={{ top: 0 }}>
               {before}
             </span>
 
-            {/* ORP character - FIXED at the anchor point (left: 0) */}
+            {/* ORP character */}
             <span className="relative font-extrabold text-orp-highlight drop-shadow-[0_0_20px_rgba(255,59,48,0.4)] z-10">
               {orp}
             </span>
 
-            {/* Text after ORP - positioned to the RIGHT, starting after the ORP */}
-            <span
-              className="absolute left-full text-text-primary"
-              style={{ top: 0 }}
-            >
+            {/* Text after ORP */}
+            <span className="absolute left-full text-text-primary" style={{ top: 0 }}>
               {after}
             </span>
           </div>

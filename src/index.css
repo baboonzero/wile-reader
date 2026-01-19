@@ -1,5 +1,5 @@
 /* Import Inter font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -7,24 +7,25 @@
 
 @layer base {
   :root {
-    --bg-primary: #0A0E27;
+    --bg-primary: #0a0e27;
     --bg-secondary: #131729;
-    --bg-gradient-start: #1A1F3A;
-    --bg-gradient-end: #0D1127;
-    --text-primary: #FFFFFF;
-    --text-secondary: #94A3B8;
-    --text-muted: #64748B;
-    --accent-primary: #8B5CF6;
-    --accent-secondary: #3B82F6;
-    --orp-highlight: #FF3B30;
-    --success: #10B981;
-    --warning: #F59E0B;
+    --bg-gradient-start: #1a1f3a;
+    --bg-gradient-end: #0d1127;
+    --text-primary: #ffffff;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-primary: #8b5cf6;
+    --accent-secondary: #3b82f6;
+    --orp-highlight: #ff3b30;
+    --success: #10b981;
+    --warning: #f59e0b;
   }
 
   body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -68,7 +69,7 @@
 
   /* Gradient text */
   .gradient-text {
-    background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+    background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -86,7 +87,34 @@
 
   /* Smooth transitions */
   .transition-smooth {
-    transition: all 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Word display positioning and sizing */
+.word-position {
+  top: 50%; /* Desktop default - centered */
+}
+
+.word-text {
+  font-size: clamp(48px, 6vw, 72px); /* Desktop: 48-72px */
+}
+
+/* Tablet: width 481px - 768px */
+@media (max-width: 768px) {
+  .word-text {
+    font-size: clamp(40px, 7vw, 52px); /* Tablet: 40-52px */
+  }
+}
+
+/* Mobile: width <= 480px - word at 30% */
+@media (max-width: 480px) {
+  .word-position {
+    top: 30% !important;
+  }
+  
+  .word-text {
+    font-size: clamp(40px, 11vw, 52px); /* Mobile: same as tablet 40-52px */
   }
 }
 
@@ -98,5 +126,23 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Short screen adjustments (iPhone SE and similar) */
+@media (max-height: 700px) {
+  /* Move word display higher on short screens */
+  .word-position-responsive {
+    top: 25% !important;
+  }
+
+  /* More compact controls on short screens */
+  .controls-compact {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  .controls-compact .space-y-4 {
+    gap: 0.5rem !important;
   }
 }

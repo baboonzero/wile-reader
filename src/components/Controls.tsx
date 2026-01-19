@@ -54,9 +54,9 @@ export function Controls({
         </div>
       )}
 
-      {/* Controls panel */}
-      <div className="glass rounded-t-3xl px-6 py-6 shadow-[0_-4px_24px_rgba(0,0,0,0.3)]">
-        <div className="max-w-2xl mx-auto space-y-6">
+      {/* Controls panel - more compact on mobile */}
+      <div className="controls-compact glass rounded-t-3xl px-4 sm:px-6 py-4 sm:py-6 shadow-[0_-4px_24px_rgba(0,0,0,0.3)]">
+        <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6">
           {/* Speed control */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
