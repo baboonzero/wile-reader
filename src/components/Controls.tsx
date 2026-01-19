@@ -8,8 +8,6 @@ interface ControlsProps {
   onWpmChange: (wpm: number) => void;
   onRestart: () => void;
   onExit: () => void;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
 }
 
 const WPM_PRESETS = [
@@ -27,8 +25,6 @@ export function Controls({
   onWpmChange,
   onRestart,
   onExit,
-  onMouseEnter,
-  onMouseLeave,
 }: ControlsProps) {
   const [localWpm, setLocalWpm] = useState(wpm);
 
@@ -37,13 +33,17 @@ export function Controls({
     onWpmChange(newWpm);
   };
 
+  // Stop click propagation so tapping controls doesn't toggle visibility
+  const handleControlsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <div
+      onClick={handleControlsClick}
       className={`fixed bottom-0 left-0 right-0 transition-smooth ${
         showControls ? 'translate-y-0' : 'translate-y-full'
       }`}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
     >
       {/* Show controls indicator when hidden */}
       {!showControls && (

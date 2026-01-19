@@ -1,0 +1,17 @@
+# Wile Reader - Robots.txt
+# https://wilereader.com/robots.txt
+
+User-agent: *
+Allow: /
+
+# Disallow private/internal files
+Disallow: /assets/
+Disallow: /*.js$
+Disallow: /*.css$
+Disallow: /*.map$
+
+# Crawl delay (optional, polite to crawlers)
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://wilereader.com/sitemap.xml

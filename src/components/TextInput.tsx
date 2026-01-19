@@ -256,13 +256,21 @@ export function TextInput({ onTextSubmit }: TextInputProps) {
           </button>
         </div>
 
-        {/* Info */}
+        {/* Footer */}
         <div className="text-center space-y-2 text-sm text-text-muted">
           <p>
             Powered by RSVP (Rapid Serial Visual Presentation)
           </p>
           <p className="text-xs">
-            Upload PDFs, Markdown files, or paste text directly
+            <a 
+              href="https://labs.anshumani.com/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-accent-primary transition-colors"
+            >
+              Anshumani Ruddra
+            </a>
+            {' '}© 2026
           </p>
         </div>
       </div>

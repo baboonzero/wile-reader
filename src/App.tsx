@@ -35,9 +35,7 @@ function App() {
     skipForward,
     skipBackward,
     restart,
-    toggleControls: showControlsHandler,
-    handleControlsMouseEnter,
-    handleControlsMouseLeave,
+    toggleControlsVisibility,
   } = useReader({
     words,
     wpm,
@@ -147,14 +145,14 @@ function App() {
           break;
         case 'Escape':
           e.preventDefault();
-          showControlsHandler();
+          toggleControlsVisibility();
           break;
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showInput, togglePlayPause, skipForward, skipBackward, showControlsHandler]);
+  }, [showInput, togglePlayPause, skipForward, skipBackward, toggleControlsVisibility]);
 
   if (showInput && !showResumePrompt) {
     return <TextInput onTextSubmit={handleTextSubmit} />;
@@ -194,11 +192,11 @@ function App() {
         />
       )}
 
-      {/* Word display */}
+      {/* Word display - tap to toggle controls */}
       <WordDisplay
         word={currentWord}
         isBraking={isBraking}
-        onTap={showControlsHandler}
+        onTap={toggleControlsVisibility}
       />
 
       {/* Controls */}
@@ -210,8 +208,6 @@ function App() {
         onWpmChange={setWpm}
         onRestart={handleRestart}
         onExit={handleExit}
-        onMouseEnter={handleControlsMouseEnter}
-        onMouseLeave={handleControlsMouseLeave}
       />
     </div>
   );

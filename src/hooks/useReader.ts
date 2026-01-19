@@ -21,7 +21,6 @@ export function useReader({ words, wpm, dynamicPacing, startIndex = 0, onComplet
   });
 
   const timerRef = useRef<number | null>(null);
-  const hideControlsTimerRef = useRef<number | null>(null);
   const brakeSpeedRef = useRef<number>(wpm);
 
   // Update words when they change
@@ -39,42 +38,6 @@ export function useReader({ words, wpm, dynamicPacing, startIndex = 0, onComplet
     setState(prev => ({ ...prev, wpm }));
     brakeSpeedRef.current = wpm;
   }, [wpm]);
-
-  // Auto-hide controls
-  const resetHideControlsTimer = useCallback(() => {
-    if (hideControlsTimerRef.current) {
-      clearTimeout(hideControlsTimerRef.current);
-    }
-
-    setState(prev => ({ ...prev, showControls: true }));
-
-    hideControlsTimerRef.current = window.setTimeout(() => {
-      setState(prev => ({
-        ...prev,
-        showControls: prev.isPlaying ? false : true,
-      }));
-    }, 8000);
-  }, []);
-
-  // Hover state for controls - prevents auto-hide while hovering
-  const isHoveringControlsRef = useRef(false);
-
-  const handleControlsMouseEnter = useCallback(() => {
-    isHoveringControlsRef.current = true;
-    // Clear hide timer while hovering
-    if (hideControlsTimerRef.current) {
-      clearTimeout(hideControlsTimerRef.current);
-      hideControlsTimerRef.current = null;
-    }
-    // Keep controls visible
-    setState(prev => ({ ...prev, showControls: true }));
-  }, []);
-
-  const handleControlsMouseLeave = useCallback(() => {
-    isHoveringControlsRef.current = false;
-    // Restart hide timer when mouse leaves
-    resetHideControlsTimer();
-  }, [resetHideControlsTimer]);
 
   // Core reading loop
   useEffect(() => {
@@ -117,20 +80,19 @@ export function useReader({ words, wpm, dynamicPacing, startIndex = 0, onComplet
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
-      if (hideControlsTimerRef.current) clearTimeout(hideControlsTimerRef.current);
     };
   }, []);
 
   const play = useCallback(() => {
     setState(prev => ({ ...prev, isPlaying: true }));
-    resetHideControlsTimer();
-  }, [resetHideControlsTimer]);
+    // Auto-hide controls after 2 seconds
+    setTimeout(() => {
+      setState(prev => ({ ...prev, showControls: false }));
+    }, 2000);
+  }, []);
 
   const pause = useCallback(() => {
     setState(prev => ({ ...prev, isPlaying: false, showControls: true }));
-    if (hideControlsTimerRef.current) {
-      clearTimeout(hideControlsTimerRef.current);
-    }
   }, []);
 
   const togglePlayPause = useCallback(() => {
@@ -146,16 +108,14 @@ export function useReader({ words, wpm, dynamicPacing, startIndex = 0, onComplet
       ...prev,
       currentIndex: Math.min(prev.currentIndex + count, words.length - 1),
     }));
-    resetHideControlsTimer();
-  }, [words.length, resetHideControlsTimer]);
+  }, [words.length]);
 
   const skipBackward = useCallback((count: number = 10) => {
     setState(prev => ({
       ...prev,
       currentIndex: Math.max(prev.currentIndex - count, 0),
     }));
-    resetHideControlsTimer();
-  }, [resetHideControlsTimer]);
+  }, []);
 
   const restart = useCallback(() => {
     setState(prev => ({
@@ -170,9 +130,10 @@ export function useReader({ words, wpm, dynamicPacing, startIndex = 0, onComplet
     setState(prev => ({ ...prev, isBraking: braking }));
   }, []);
 
-  const showControls = useCallback(() => {
-    resetHideControlsTimer();
-  }, [resetHideControlsTimer]);
+  // Simple toggle: tap to show/hide controls
+  const toggleControlsVisibility = useCallback(() => {
+    setState(prev => ({ ...prev, showControls: !prev.showControls }));
+  }, []);
 
   const currentWord = words[state.currentIndex] || null;
   const progress = words.length > 0 ? (state.currentIndex / words.length) * 100 : 0;
@@ -192,8 +153,6 @@ export function useReader({ words, wpm, dynamicPacing, startIndex = 0, onComplet
     skipBackward,
     restart,
     setBraking,
-    toggleControls: showControls,
-    handleControlsMouseEnter,
-    handleControlsMouseLeave,
+    toggleControlsVisibility,
   };
 }

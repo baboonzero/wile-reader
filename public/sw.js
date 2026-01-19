@@ -1,22 +1,19 @@
 // Wile Reader Service Worker
-// Caches all app assets for offline use
+// Uses network-first for HTML/JS to avoid stale content on deploy
 
-const CACHE_NAME = 'wile-reader-v1';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
+const CACHE_NAME = 'wile-reader-v2';
+const STATIC_ASSETS = [
   '/icon-192.png',
   '/icon-512.png',
   '/pdf.worker.min.mjs'
 ];
 
-// Install event - cache core assets
+// Install event - cache static assets only
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('Wile Reader: Caching app assets');
-      return cache.addAll(ASSETS_TO_CACHE);
+      console.log('Wile Reader: Caching static assets');
+      return cache.addAll(STATIC_ASSETS);
     })
   );
   // Activate immediately
@@ -38,7 +35,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - network-first for HTML/JS, cache-first for static assets
 self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (event.request.method !== 'GET') return;
@@ -46,34 +43,56 @@ self.addEventListener('fetch', (event) => {
   // Skip chrome-extension and other non-http requests
   if (!event.request.url.startsWith('http')) return;
 
+  const url = new URL(event.request.url);
+  
+  // Network-first for HTML and JS files (critical for fresh deploys)
+  if (event.request.mode === 'navigate' || 
+      url.pathname.endsWith('.html') || 
+      url.pathname.endsWith('.js') ||
+      url.pathname.endsWith('.css')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          // Cache the fresh response
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+          return networkResponse;
+        })
+        .catch(() => {
+          // Network failed, try cache
+          return caches.match(event.request).then((cachedResponse) => {
+            if (cachedResponse) return cachedResponse;
+            // For navigation, return cached index.html
+            if (event.request.mode === 'navigate') {
+              return caches.match('/index.html');
+            }
+            return new Response('Offline', { status: 503 });
+          });
+        })
+    );
+    return;
+  }
+
+  // Cache-first for static assets (images, fonts, etc.)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Return cached version
         return cachedResponse;
       }
 
-      // Not in cache - fetch from network
       return fetch(event.request).then((networkResponse) => {
-        // Don't cache non-success responses
         if (!networkResponse || networkResponse.status !== 200) {
           return networkResponse;
         }
 
-        // Cache the new resource
         const responseClone = networkResponse.clone();
         caches.open(CACHE_NAME).then((cache) => {
           cache.put(event.request, responseClone);
         });
 
         return networkResponse;
-      }).catch(() => {
-        // Network failed and not in cache
-        // For navigation requests, return the cached index.html
-        if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
-        }
-        return new Response('Offline', { status: 503 });
       });
     })
   );
