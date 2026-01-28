@@ -9,6 +9,7 @@ import { parseText } from './utils/textParser';
 import { useReader } from './hooks/useReader';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { generateContentHash, saveReadingSession, getReadingSession, clearReadingSession } from './utils/storage';
+import { analytics } from './utils/analytics';
 import { Word } from './types';
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
     startIndex,
     onComplete: () => {
       setIsComplete(true);
+      analytics.completeReading(words.length, wpm);
       // Clear saved session on completion
       if (contentHash) {
         clearReadingSession();
@@ -73,29 +75,38 @@ function App() {
     
     const parsedWords = parseText(text);
     setWords(parsedWords);
-    setStartIndex(resumeFromSaved && savedSession ? savedSession.position : 0);
+    const resumePosition = resumeFromSaved && savedSession ? savedSession.position : 0;
+    setStartIndex(resumePosition);
     setShowInput(false);
     setShowResumePrompt(false);
     setIsComplete(false);
-  }, []);
+
+    // Track reading start (only when actually starting, not showing resume prompt)
+    if (resumePosition === 0) {
+      analytics.startReading(parsedWords.length, wpm);
+    }
+  }, [wpm]);
 
   const handleResumeReading = useCallback(() => {
     setStartIndex(savedPosition);
     setShowInput(false);
     setShowResumePrompt(false);
     setIsComplete(false);
-  }, [savedPosition]);
+    analytics.resumeReading(savedPosition, words.length);
+  }, [savedPosition, words.length]);
 
   const handleStartFresh = useCallback(() => {
     setStartIndex(0);
     setShowInput(false);
     setShowResumePrompt(false);
     setIsComplete(false);
+    analytics.startFresh();
+    analytics.startReading(words.length, wpm);
     // Clear old session
     if (contentHash) {
       clearReadingSession();
     }
-  }, [contentHash]);
+  }, [contentHash, words.length, wpm]);
 
   const handleRestart = useCallback(() => {
     restart();
@@ -103,6 +114,10 @@ function App() {
   }, [restart]);
 
   const handleExit = useCallback(() => {
+    // Track exit before clearing state
+    if (currentIndex > 0 && totalWords > 0) {
+      analytics.exitReading(currentIndex, totalWords);
+    }
     // Save current position before exiting
     if (contentHash && currentIndex > 0 && currentIndex < totalWords) {
       saveReadingSession(contentHash, currentIndex, totalWords);

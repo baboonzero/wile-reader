@@ -19,6 +19,7 @@
     "@vitejs/plugin-react": "^5.1.2",
     "marked": "^17.0.1",
     "pdfjs-dist": "^5.4.530",
+    "posthog-js": "^1.335.5",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "vite": "^7.3.1"

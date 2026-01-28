@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { getWordCount } from '../utils/textParser';
 import { parsePDF, parseMarkdown, validateFile, formatFileSize } from '../utils/fileParser';
+import { analytics } from '../utils/analytics';
 
 interface TextInputProps {
   onTextSubmit: (text: string) => void;
@@ -28,6 +29,17 @@ export function TextInput({ onTextSubmit }: TextInputProps) {
 
   const handleSubmit = () => {
     if (text.trim()) {
+      // Track input method: if there's a selected file, it's from a file, otherwise it's text
+      if (selectedFile) {
+        const ext = selectedFile.name.toLowerCase();
+        if (ext.endsWith('.pdf')) {
+          analytics.inputMethodUsed('pdf');
+        } else {
+          analytics.inputMethodUsed('markdown');
+        }
+      } else {
+        analytics.inputMethodUsed('text');
+      }
       onTextSubmit(text.trim());
     }
   };
